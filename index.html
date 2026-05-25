@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BR Company — Open Box Electronics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#13131c;--card:#1a1a27;--border:#2a2a3d;
+  --accent:#00d4ff;--accent2:#7c3aed;--green:#00e676;
+  --text:#f0f0ff;--muted:#8888aa;--red:#ff4444;--wa:#25d366;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:2px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
+.logo span{color:var(--accent);-webkit-text-fill-color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.cart-btn{position:relative;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:.5rem 1rem;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color .2s,background .2s;font-family:'DM Sans',sans-serif}
+.cart-btn:hover{border-color:var(--accent);background:#1e1e2e}
+.cart-count{position:absolute;top:-6px;right:-6px;background:var(--accent);color:#000;font-size:.65rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.cart-count.hidden{display:none}
+
+/* HERO */
+.hero{padding:5rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 50%,rgba(0,212,255,.07) 0%,transparent 70%),radial-gradient(ellipse 50% 60% at 80% 30%,rgba(124,58,237,.1) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);border-radius:50px;padding:.35rem 1rem;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:1.5rem;animation:fadeUp .8s both}
+.hero-badge::before{content:'●';font-size:.5rem;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.5rem,7vw,5rem);line-height:1.05;letter-spacing:-2px;animation:fadeUp .8s both .1s}
+.hero h1 .accent{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1.1rem;margin-top:1rem;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7;animation:fadeUp .8s both .2s}
+.trust-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2rem;animation:fadeUp .8s both .3s}
+.badge{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:.4rem 1rem;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION */
+.section{padding:3rem 2rem}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.4rem,4vw,2rem);letter-spacing:-.5px}
+.section-title span{color:var(--accent)}
+.product-count{color:var(--muted);font-size:.85rem}
+
+/* FILTER */
+.filter-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.filter-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.4rem .9rem;font-size:.8rem;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:500}
+
+/* GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+
+/* PRODUCT CARD */
+.product-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s;animation:fadeUp .6s both}
+.product-card:hover{transform:translateY(-5px);border-color:rgba(0,212,255,.3);box-shadow:0 20px 60px rgba(0,212,255,.08)}
+.product-image{width:100%;aspect-ratio:4/3;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden}
+.product-image img{width:100%;height:100%;object-fit:cover}
+.product-image .placeholder-icon{font-size:3.5rem;opacity:.6}
+.type-tag{position:absolute;top:12px;left:12px;border-radius:6px;padding:.25rem .6rem;font-size:.7rem;font-weight:500;letter-spacing:.5px}
+.type-new{background:linear-gradient(135deg,#00b37e,#00e676);color:#002b1a}
+.type-open{background:linear-gradient(135deg,var(--accent2),#9333ea);color:#fff}
+.bill-tag{position:absolute;top:12px;right:12px;background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.4);color:var(--green);border-radius:6px;padding:.25rem .6rem;font-size:.7rem;letter-spacing:.5px}
+.out-of-stock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.9rem;letter-spacing:1px}
+.product-body{padding:1.2rem}
+.product-brand{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:.3rem;font-weight:500}
+.product-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;line-height:1.3;margin-bottom:.4rem}
+.product-desc{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product-condition{display:inline-flex;align-items:center;gap:5px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--accent);border-radius:6px;padding:.2rem .6rem;font-size:.72rem;margin-bottom:.9rem}
+.price-row{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap}
+.price{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text)}
+.price-original{font-size:.85rem;color:var(--muted);text-decoration:line-through}
+.discount-badge{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green);border-radius:4px;padding:.15rem .4rem;font-size:.72rem;font-weight:600}
+.card-actions{display:flex;gap:.6rem}
+.btn-wa{flex:1;background:var(--wa);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s,transform .1s;font-family:'DM Sans',sans-serif;text-decoration:none}
+.btn-wa:hover{opacity:.9}
+.btn-wa:active{transform:scale(.98)}
+.btn-cart{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.65rem .9rem;cursor:pointer;transition:border-color .2s,background .2s;font-size:1.1rem}
+.btn-cart:hover{border-color:var(--accent);background:var(--card)}
+.btn-cart.added{border-color:var(--green);color:var(--green)}
+
+/* CART SIDEBAR */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-sidebar{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);z-index:201;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.cart-sidebar.open{transform:translateX(0)}
+.cart-head{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-head h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem}
+.close-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:color .2s}
+.close-btn:hover{color:var(--text)}
+.cart-items{flex:1;overflow-y:auto;padding:1rem 1.5rem}
+.cart-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.cart-empty .empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+.cart-item{display:flex;gap:1rem;align-items:center;padding:.9rem 0;border-bottom:1px solid var(--border)}
+.cart-item-img{width:60px;height:60px;border-radius:10px;background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;overflow:hidden}
+.cart-item-img img{width:100%;height:100%;object-fit:cover}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:.88rem;font-weight:500;margin-bottom:.2rem}
+.cart-item-price{font-size:.82rem;color:var(--accent);font-weight:600}
+.cart-item-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:.3rem;transition:color .2s}
+.cart-item-remove:hover{color:var(--red)}
+.cart-foot{padding:1.5rem;border-top:1px solid var(--border)}
+.cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.cart-total-label{color:var(--muted);font-size:.9rem}
+.cart-total-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem}
+.btn-order-wa{width:100%;background:var(--wa);color:#fff;border:none;border-radius:12px;padding:.9rem;font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;font-family:'DM Sans',sans-serif;text-decoration:none}
+.btn-order-wa:hover{opacity:.9}
+
+/* ADMIN LOGIN MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;width:min(380px,92vw);text-align:center}
+.modal-box h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.4rem}
+.modal-box p{color:var(--muted);font-size:.85rem;margin-bottom:1.5rem}
+.modal-box input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.7rem 1rem;font-size:1rem;font-family:'DM Sans',sans-serif;outline:none;text-align:center;letter-spacing:3px;margin-bottom:1rem;transition:border-color .2s}
+.modal-box input:focus{border-color:var(--accent)}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:.8rem;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s;margin-bottom:.7rem}
+.btn-login:hover{opacity:.85}
+.btn-cancel-login{background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:.6rem;font-size:.85rem;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-cancel-login:hover{border-color:var(--muted);color:var(--text)}
+.login-error{color:var(--red);font-size:.82rem;margin-bottom:.8rem;display:none}
+
+/* ADMIN PANEL */
+.admin-toggle{text-align:center;padding:1rem 2rem}
+.btn-admin{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.5rem 1.2rem;font-size:.8rem;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-admin:hover{border-color:var(--accent2);color:var(--accent2)}
+.btn-logout{background:none;border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:8px;padding:.3rem .8rem;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-left:.5rem}
+.btn-logout:hover{border-color:var(--red);background:rgba(255,68,68,.1)}
+
+.admin-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:20px;margin:0 2rem 2rem;padding:2rem}
+.admin-panel.open{display:block}
+.admin-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.admin-panel-header h3{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent2)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.6rem .8rem;font-size:.9rem;font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group select option{background:var(--card)}
+.form-group textarea{resize:vertical;min-height:70px}
+.admin-actions{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1rem}
+.btn-add-product{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.btn-add-product:hover{opacity:.85}
+.admin-note{margin-top:1rem;padding:.8rem 1rem;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:10px;font-size:.8rem;color:var(--muted)}
+
+/* PRODUCT LIST IN ADMIN */
+.admin-products-list{margin-top:2rem;border-top:1px solid var(--border);padding-top:1.5rem}
+.admin-products-list h4{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:1rem;color:var(--muted)}
+.admin-product-row{display:flex;align-items:center;gap:1rem;padding:.8rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:.6rem;flex-wrap:wrap}
+.admin-product-thumb{width:44px;height:44px;border-radius:8px;background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;overflow:hidden}
+.admin-product-thumb img{width:100%;height:100%;object-fit:cover}
+.admin-product-info{flex:1;min-width:120px}
+.admin-product-name{font-size:.88rem;font-weight:500}
+.admin-product-meta{font-size:.75rem;color:var(--muted);margin-top:2px}
+.admin-product-actions{display:flex;gap:.5rem;flex-shrink:0}
+.btn-toggle-stock{background:none;border:1px solid var(--border);border-radius:8px;padding:.3rem .7rem;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-toggle-stock.in{border-color:rgba(0,230,118,.4);color:var(--green)}
+.btn-toggle-stock.in:hover{background:rgba(0,230,118,.1)}
+.btn-toggle-stock.out{border-color:rgba(255,179,0,.4);color:#ffb300}
+.btn-toggle-stock.out:hover{background:rgba(255,179,0,.1)}
+.btn-delete{background:none;border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:8px;padding:.3rem .7rem;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-delete:hover{background:rgba(255,68,68,.1);border-color:var(--red)}
+
+/* FOOTER */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:2rem;text-align:center}
+footer .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem}
+footer p{color:var(--muted);font-size:.82rem;line-height:1.6}
+footer .wa-link{display:inline-flex;align-items:center;gap:6px;color:var(--wa);text-decoration:none;font-weight:500;margin-top:.5rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;border-radius:50px;padding:.6rem 1.4rem;font-size:.88rem;font-weight:600;z-index:400;transition:transform .3s cubic-bezier(.16,1,.3,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:600px){
+  nav{padding:0 1rem}
+  .hero{padding:3rem 1rem 2rem}
+  .section{padding:2rem 1rem}
+  .admin-panel{margin:0 1rem 2rem}
+  .filter-bar{gap:.4rem}
+  .filter-btn{font-size:.72rem;padding:.35rem .7rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">BR<span>.</span>Company</div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="toggleCart()">
+      🛒 Cart
+      <span class="cart-count hidden" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">● Live & Verified Stock</div>
+  <h1>Open Box <span class="accent">Electronics</span><br>You Can Trust</h1>
+  <p>Genuine Amazon & Flipkart open box products. Every item comes with original bill — 100% authentic, deeply discounted.</p>
+  <div class="trust-badges">
+    <span class="badge"><span class="dot"></span>Original Bill Included</span>
+    <span class="badge"><span class="dot"></span>Amazon & Flipkart Sourced</span>
+    <span class="badge"><span class="dot"></span>100% Authentic</span>
+    <span class="badge"><span class="dot"></span>Order via WhatsApp</span>
+  </div>
+</div>
+
+<!-- PRODUCTS SECTION -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Our <span>Products</span></div>
+    <div class="product-count" id="productCount">0 items</div>
+  </div>
+  <div class="filter-bar" id="filterBar"></div>
+  <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<!-- ADMIN TOGGLE -->
+<div class="admin-toggle">
+  <button class="btn-admin" id="adminToggleBtn" onclick="handleAdminToggle()">⚙ Manage Products (Admin)</button>
+  <button class="btn-logout" id="logoutBtn" style="display:none" onclick="adminLogout()">Logout</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-panel-header">
+    <h3>⚙ Add New Product</h3>
+    <span style="font-size:.8rem;color:var(--green)">🔒 Admin Mode</span>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Product Name *</label>
+      <input id="pName" placeholder="e.g. Samsung Galaxy S23"/>
+    </div>
+    <div class="form-group">
+      <label>Brand *</label>
+      <input id="pBrand" placeholder="e.g. Samsung"/>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="pCategory">
+        <option>Smartphones</option>
+        <option>Laptops</option>
+        <option>Tablets</option>
+        <option>Earbuds / Headphones</option>
+        <option>Smart Watches</option>
+        <option>Cameras</option>
+        <option>TVs</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Condition</label>
+      <select id="pCondition">
+        <option value="Brand New">Brand New</option>
+        <option value="Open Box">Open Box</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Selling Price (₹) *</label>
+      <input id="pPrice" type="number" placeholder="e.g. 18999"/>
+    </div>
+    <div class="form-group">
+      <label>Original MRP (₹)</label>
+      <input id="pMRP" type="number" placeholder="e.g. 34999"/>
+    </div>
+    <div class="form-group">
+      <label>Image URL (optional)</label>
+      <input id="pImage" placeholder="https://..."/>
+    </div>
+    <div class="form-group">
+      <label>In Stock?</label>
+      <select id="pStock">
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:.5rem">
+    <label>Description</label>
+    <textarea id="pDesc" placeholder="Brief product description, key specs, included accessories..."></textarea>
+  </div>
+  <div class="admin-actions">
+    <button class="btn-add-product" onclick="addProduct()">+ Add Product</button>
+  </div>
+  <div class="admin-note">💡 Products save in the browser. Host this HTML file so data persists for every visitor.</div>
+
+  <!-- PRODUCT LIST TO MANAGE -->
+  <div class="admin-products-list">
+    <h4>📦 All Products — click to toggle stock or delete</h4>
+    <div id="adminProductList"></div>
+  </div>
+</div>
+
+<!-- CART OVERLAY + SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-head">
+    <h2>Your Cart 🛒</h2>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot" id="cartFoot" style="display:none">
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount" id="cartTotal">₹0</span>
+    </div>
+    <a href="#" class="btn-order-wa" id="waOrderBtn" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.116 1.528 5.845L.057 23.428a.5.5 0 00.514.572l5.761-1.508A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.377l-.36-.213-3.724.975.993-3.63-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+      Order via WhatsApp
+    </a>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box">
+    <h2>🔐 Admin Access</h2>
+    <p>Enter your admin password to manage products</p>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+    <input type="password" id="adminPwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkAdminLogin()"/>
+    <button class="btn-login" onclick="checkAdminLogin()">Unlock Admin Panel</button>
+    <button class="btn-cancel-login" onclick="closeLoginModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">BR Company</div>
+  <p>Open Box Electronics — Amazon & Flipkart Returns<br>100% Authentic · Original Bill Included · Delhi, India</p>
+  <a class="wa-link" href="https://wa.me/919988676555" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.116 1.528 5.845L.057 23.428a.5.5 0 00.514.572l5.761-1.508A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.377l-.36-.213-3.724.975.993-3.63-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>
+    +91 99886 76555
+  </a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WA = '919988676555';
+const ADMIN_PASSWORD = 'brcompany2024'; // ← change this to your password
+
+const defaultProducts = [
+  {id:1,name:'iPhone 13 128GB',brand:'Apple',category:'Smartphones',condition:'Open Box',price:42999,mrp:69900,desc:'Open box iPhone 13 in midnight black. Includes original charger, cable & box. Battery health 98%. Amazon bill included.',image:'',inStock:true},
+  {id:2,name:'Samsung Galaxy Buds2 Pro',brand:'Samsung',category:'Earbuds / Headphones',condition:'Open Box',price:5499,mrp:17999,desc:'Open box Galaxy Buds2 Pro with ANC. All accessories included. Flipkart bill attached.',image:'',inStock:true},
+  {id:3,name:'Redmi Note 12 Pro 5G',brand:'Xiaomi',category:'Smartphones',condition:'Brand New',price:17499,mrp:24999,desc:'Brand new sealed box. 8GB RAM, 256GB storage. Original Flipkart bill.',image:'',inStock:true},
+  {id:4,name:'boAt Rockerz 450 Headphones',brand:'boAt',category:'Earbuds / Headphones',condition:'Open Box',price:999,mrp:2999,desc:'Open box Bluetooth headphones. 15hr battery. All original accessories included.',image:'',inStock:false},
+];
+
+let products = JSON.parse(localStorage.getItem('br_products') || 'null') || defaultProducts;
+let cart = JSON.parse(localStorage.getItem('br_cart') || '[]');
+let nextId = Math.max(...products.map(p=>p.id), 0) + 1;
+let activeFilter = 'All';
+let adminLoggedIn = false;
+
+const catEmoji = {'Smartphones':'📱','Laptops':'💻','Tablets':'📟','Earbuds / Headphones':'🎧','Smart Watches':'⌚','Cameras':'📷','TVs':'📺','Other':'📦'};
+const waIcon = `<svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.116 1.528 5.845L.057 23.428a.5.5 0 00.514.572l5.761-1.508A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.377l-.36-.213-3.724.975.993-3.63-.234-.374A9.818 9.818 0 1112 21.818z"/></svg>`;
+
+function save(){ localStorage.setItem('br_products', JSON.stringify(products)); localStorage.setItem('br_cart', JSON.stringify(cart)); }
+function formatPrice(n){ return '₹'+Number(n).toLocaleString('en-IN'); }
+function discount(p,m){ return m&&m>p ? Math.round((m-p)/m*100) : 0; }
+
+// ── FILTERS ──
+function renderFilters(){
+  const cats = ['All',...new Set(products.map(p=>p.category))];
+  document.getElementById('filterBar').innerHTML = cats.map(c=>
+    `<button class="filter-btn${c===activeFilter?' active':''}" onclick="setFilter('${c}')">${c}</button>`
+  ).join('');
+}
+function setFilter(cat){ activeFilter=cat; renderFilters(); renderProducts(); }
+
+// ── PRODUCTS ──
+function renderProducts(){
+  const filtered = activeFilter==='All' ? products : products.filter(p=>p.category===activeFilter);
+  document.getElementById('productCount').textContent = filtered.length+' item'+(filtered.length!==1?'s':'');
+  const grid = document.getElementById('productsGrid');
+  if(!filtered.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)"><div style="font-size:3rem;margin-bottom:1rem">📦</div>No products yet. Add some in the admin panel!</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map((p,i)=>{
+    const disc = discount(p.price, p.mrp);
+    const inCart = cart.some(c=>c.id===p.id);
+    const isNew = p.condition === 'Brand New';
+    return `
+    <div class="product-card" style="animation-delay:${i*0.07}s">
+      <div class="product-image">
+        ${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'"/>` : `<span class="placeholder-icon">${catEmoji[p.category]||'📦'}</span>`}
+        <span class="type-tag ${isNew?'type-new':'type-open'}">${isNew?'✦ BRAND NEW':'OPEN BOX'}</span>
+        <span class="bill-tag">✓ Bill</span>
+        ${!p.inStock?'<div class="out-of-stock-overlay">OUT OF STOCK</div>':''}
+      </div>
+      <div class="product-body">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc||'Authentic product with original bill.'}</div>
+        <span class="product-condition">★ ${p.condition}</span>
+        <div class="price-row">
+          <span class="price">${formatPrice(p.price)}</span>
+          ${p.mrp?`<span class="price-original">${formatPrice(p.mrp)}</span>`:''}
+          ${disc?`<span class="discount-badge">${disc}% OFF</span>`:''}
+        </div>
+        <div class="card-actions">
+          ${p.inStock
+            ? `<a class="btn-wa" href="${waLink(p)}" target="_blank">${waIcon} Buy Now</a>
+               <button class="btn-cart${inCart?' added':''}" onclick="toggleCart2(${p.id},event)" title="${inCart?'In cart':'Add to cart'}">${inCart?'✓':'🛒'}</button>`
+            : `<button class="btn-wa" style="background:#333;cursor:not-allowed;pointer-events:none">Out of Stock</button>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function waLink(p){
+  const msg = encodeURIComponent(`Hi BR Company! I want to buy:\n\n*${p.name}*\nCondition: ${p.condition}\nPrice: ${formatPrice(p.price)}\n\nPlease confirm availability.`);
+  return `https://wa.me/${WA}?text=${msg}`;
+}
+
+// ── CART ──
+function toggleCart2(id, e){
+  e.stopPropagation();
+  const p = products.find(x=>x.id===id);
+  if(!p||!p.inStock) return;
+  const idx = cart.findIndex(c=>c.id===id);
+  if(idx>-1){ cart.splice(idx,1); showToast('Removed from cart'); }
+  else { cart.push({id:p.id,name:p.name,price:p.price,brand:p.brand,image:p.image,category:p.category}); showToast('Added to cart! 🛒'); }
+  save(); updateCartUI(); renderProducts();
+}
+function updateCartUI(){
+  const count = cart.length;
+  const el = document.getElementById('cartCount');
+  el.textContent = count;
+  el.classList.toggle('hidden', count===0);
+  const items = document.getElementById('cartItems');
+  const foot = document.getElementById('cartFoot');
+  if(!count){
+    items.innerHTML='<div class="cart-empty"><div class="empty-icon">🛒</div><p>Your cart is empty</p></div>';
+    foot.style.display='none'; return;
+  }
+  foot.style.display='block';
+  items.innerHTML = cart.map(c=>`
+    <div class="cart-item">
+      <div class="cart-item-img">${c.image?`<img src="${c.image}" alt="${c.name}"/>`:(catEmoji[c.category]||'📦')}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${c.name}</div>
+        <div class="cart-item-price">${formatPrice(c.price)}</div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart(${c.id})">✕</button>
+    </div>`).join('');
+  const total = cart.reduce((s,c)=>s+c.price,0);
+  document.getElementById('cartTotal').textContent = formatPrice(total);
+  const txt = cart.map(c=>`• ${c.name} — ${formatPrice(c.price)}`).join('\n');
+  const msg = encodeURIComponent(`Hi BR Company! I want to order:\n\n${txt}\n\n*Total: ${formatPrice(total)}*\n\nPlease confirm availability & payment details.`);
+  document.getElementById('waOrderBtn').href = `https://wa.me/${WA}?text=${msg}`;
+}
+function removeFromCart(id){ cart=cart.filter(c=>c.id!==id); save(); updateCartUI(); renderProducts(); }
+function toggleCart(){ document.getElementById('cartOverlay').classList.toggle('open'); document.getElementById('cartSidebar').classList.toggle('open'); }
+
+// ── ADMIN LOGIN ──
+function handleAdminToggle(){
+  if(adminLoggedIn){ toggleAdminPanel(); }
+  else { openLoginModal(); }
+}
+function openLoginModal(){
+  document.getElementById('loginModal').classList.add('open');
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('adminPwd').value='';
+  setTimeout(()=>document.getElementById('adminPwd').focus(), 200);
+}
+function closeLoginModal(){ document.getElementById('loginModal').classList.remove('open'); }
+function checkAdminLogin(){
+  const pwd = document.getElementById('adminPwd').value;
+  if(pwd === ADMIN_PASSWORD){
+    adminLoggedIn = true;
+    closeLoginModal();
+    document.getElementById('logoutBtn').style.display='inline-block';
+    document.getElementById('adminToggleBtn').textContent='⚙ Admin Panel';
+    toggleAdminPanel();
+    showToast('Welcome back, Admin! 🔓');
+  } else {
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('adminPwd').value='';
+    document.getElementById('adminPwd').focus();
+  }
+}
+function adminLogout(){
+  adminLoggedIn=false;
+  document.getElementById('adminPanel').classList.remove('open');
+  document.getElementById('logoutBtn').style.display='none';
+  document.getElementById('adminToggleBtn').textContent='⚙ Manage Products (Admin)';
+  showToast('Logged out');
+}
+function toggleAdminPanel(){
+  document.getElementById('adminPanel').classList.toggle('open');
+  if(document.getElementById('adminPanel').classList.contains('open')) renderAdminList();
+}
+
+// ── ADD PRODUCT ──
+function addProduct(){
+  const name = document.getElementById('pName').value.trim();
+  const price = parseFloat(document.getElementById('pPrice').value);
+  if(!name||!price){ showToast('Please fill name & price ⚠️'); return; }
+  const p = {
+    id: nextId++, name,
+    brand: document.getElementById('pBrand').value||'BR Company',
+    category: document.getElementById('pCategory').value,
+    condition: document.getElementById('pCondition').value,
+    price, mrp: parseFloat(document.getElementById('pMRP').value)||0,
+    desc: document.getElementById('pDesc').value,
+    image: document.getElementById('pImage').value.trim(),
+    inStock: document.getElementById('pStock').value==='1'
+  };
+  products.unshift(p);
+  save();
+  ['pName','pBrand','pPrice','pMRP','pDesc','pImage'].forEach(id=>document.getElementById(id).value='');
+  renderFilters(); renderProducts(); renderAdminList();
+  showToast('Product added! ✅');
+}
+
+// ── ADMIN PRODUCT LIST ──
+function renderAdminList(){
+  const list = document.getElementById('adminProductList');
+  if(!products.length){ list.innerHTML='<p style="color:var(--muted);font-size:.85rem">No products yet.</p>'; return; }
+  list.innerHTML = products.map(p=>`
+    <div class="admin-product-row">
+      <div class="admin-product-thumb">${p.image?`<img src="${p.image}" onerror="this.style.display='none'"/>`:''}${catEmoji[p.category]||'📦'}</div>
+      <div class="admin-product-info">
+        <div class="admin-product-name">${p.name}</div>
+        <div class="admin-product-meta">${p.brand} · ${p.condition} · ${formatPrice(p.price)}${p.mrp?` (MRP ${formatPrice(p.mrp)})`:''}
+        </div>
+      </div>
+      <div class="admin-product-actions">
+        <button class="btn-toggle-stock ${p.inStock?'in':'out'}" onclick="toggleStock(${p.id})">${p.inStock?'In Stock':'Out of Stock'}</button>
+        <button class="btn-delete" onclick="deleteProduct(${p.id})">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleStock(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  p.inStock = !p.inStock;
+  save(); renderProducts(); renderAdminList();
+  showToast(p.inStock ? 'Marked In Stock ✅' : 'Marked Out of Stock');
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete this product? This cannot be undone.')) return;
+  products = products.filter(p=>p.id!==id);
+  cart = cart.filter(c=>c.id!==id);
+  save(); renderFilters(); renderProducts(); renderAdminList(); updateCartUI();
+  showToast('Product deleted 🗑');
+}
+
+// ── TOAST ──
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+// ── INIT ──
+renderFilters();
+renderProducts();
+updateCartUI();
+</script>
+</body>
+</html>
